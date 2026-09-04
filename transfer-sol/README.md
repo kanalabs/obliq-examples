@@ -52,6 +52,10 @@ wallet key signs the transfer, never leaves your machine, and we never see it.
 cp .env.example .env
 npm install
 ```
+> **One file for all three.** Copy the repository root's `.env.example` to `../.env`, fill it in once, and every example here reads it. A `.env` in this directory
+> still wins if you want to override something for this example alone. Both start with a
+> dot, so most editors hide them — `ls -a` will show them.
+
 
 `.env` knobs (all optional on local — sensible defaults apply):
 

@@ -7,6 +7,14 @@ network fee. The user signs the swap authority; Obliq co-signs the fee-payer slo
 > **mainnet**. The `quote` command is read-only and works anywhere; `swap` refuses
 > to run off mainnet unless you set `ALLOW_NON_MAINNET=true`.
 
+## Why routing is restricted
+
+The quote passes `dexes=`, limiting routes to Raydium, Orca and Meteora. Jupiter's router
+otherwise reaches venues absent from its own published program-id map — which is what the
+paymaster's allowlist is built from — and the swap is then refused *after* you have signed it.
+A thin pair may return no route instead; that refusal arrives before signing, which is the
+point.
+
 ## Why this needs `/swap-instructions`, not `/swap`
 
 Jupiter's `POST /swap/v1/swap` returns a ready-made transaction whose **fee payer
@@ -20,7 +28,7 @@ sequenceDiagram
     participant Jupiter
     participant Obliq
     participant RPC as Solana RPC
-    App->>Jupiter: GET /swap/v1/quote (USDC→SOL)
+    App->>Jupiter: GET /swap/v1/quote (USDC→SOL, dexes=sponsored venues)
     Jupiter-->>App: quote (route, amounts)
     App->>Jupiter: POST /swap/v1/swap-instructions (userPublicKey)
     Jupiter-->>App: computeBudget / setup / swap / cleanup ixs + ALTs
@@ -35,7 +43,7 @@ sequenceDiagram
 
 | Jupiter call | What it returns | We use |
 |--------------|-----------------|--------|
-| `GET /swap/v1/quote` | `inAmount`, `outAmount`, `routePlan`, `priceImpactPct` | the route + amounts |
+| `GET /swap/v1/quote` | `inAmount`, `outAmount`, `routePlan`, `priceImpactPct` | the route + amounts, restricted to sponsored venues |
 | `POST /swap/v1/swap-instructions` | `computeBudgetInstructions[]`, `setupInstructions[]`, `swapInstruction`, `cleanupInstruction`, `addressLookupTableAddresses[]` | assemble our tx |
 
 Each instruction is `{ programId, accounts: [{pubkey,isSigner,isWritable}], data(base64) }`;
@@ -74,6 +82,10 @@ reply with a tenant id, an API key and your fee-payer address.
 ```bash
 cp .env.example .env
 ```
+> **One file for all three.** Copy the repository root's `.env.example` to `../.env`, fill it in once, and every example here reads it. A `.env` in this directory
+> still wins if you want to override something for this example alone. Both start with a
+> dot, so most editors hide them — `ls -a` will show them.
+
 
 Then fill in two values:
 

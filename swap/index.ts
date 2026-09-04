@@ -32,7 +32,14 @@ import {
 } from "@solana/web3.js";
 import { getAssociatedTokenAddressSync, getAccount } from "@solana/spl-token";
 import bs58 from "bs58";
-import "dotenv/config";
+import dotenv from "dotenv";
+
+// Look in this example's own directory first, then one level up. Each example is
+// a separate package, so `dotenv` would otherwise only ever see a `.env` sitting
+// beside the file you ran — meaning the same key had to be pasted three times to
+// try all three. The parent file lets you fill it in once; a local `.env` still
+// wins, because the first file to define a key keeps it.
+dotenv.config({ path: [".env", "../.env"] });
 
 const SOLANA_RPC_URL = process.env.SOLANA_RPC_URL ?? "https://api.mainnet-beta.solana.com";
 const OBLIQ_RPC_URL = process.env.OBLIQ_RPC_URL ?? "https://solana-paymaster-mainnet.kanalabs.io/rpc";
@@ -72,6 +79,32 @@ async function obliqRpc<T = any>(method: string, params: unknown = {}): Promise<
 function jupHeaders(): Record<string, string> {
   return JUPITER_API_KEY ? { "x-api-key": JUPITER_API_KEY } : {};
 }
+/**
+ * The venues a route may use.
+ *
+ * Jupiter's router reaches venues its own published program-id→label map omits,
+ * and that map is what the paymaster's DEX registry syncs. Left unrestricted, a
+ * swap can be refused *after* you have signed it — "Program … is not in the
+ * allowed list" — which is the worst moment to discover it. Filtering by label
+ * alone does not help either: one label can cover several program ids, and at
+ * least one venue publishes one id while routing through another.
+ *
+ * So routing is limited to three major venue families whose program ids are
+ * stable and sponsored. Some thin pairs will return no route; that refusal
+ * arrives before you sign, which is the point.
+ */
+const SPONSORED_DEXES = [
+  "Raydium",
+  "Raydium CLMM",
+  "Raydium CP",
+  "Whirlpool",
+  "Orca V1",
+  "Orca V2",
+  "Meteora",
+  "Meteora DLMM",
+  "Meteora DAMM v2",
+];
+
 async function jupQuote(amountBaseUnits: bigint): Promise<any> {
   const url = new URL(`${JUPITER_BASE_URL}/swap/v1/quote`);
   url.searchParams.set("inputMint", INPUT_MINT);
@@ -79,6 +112,7 @@ async function jupQuote(amountBaseUnits: bigint): Promise<any> {
   url.searchParams.set("amount", amountBaseUnits.toString());
   url.searchParams.set("slippageBps", String(SLIPPAGE_BPS));
   url.searchParams.set("restrictIntermediateTokens", "true");
+  url.searchParams.set("dexes", SPONSORED_DEXES.join(","));
   const res = await fetch(url, { headers: jupHeaders() });
   if (!res.ok) throw new Error(`Jupiter quote ${res.status}: ${await res.text()}`);
   return res.json();

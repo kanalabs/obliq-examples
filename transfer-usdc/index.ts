@@ -36,7 +36,14 @@ import {
   createAssociatedTokenAccountIdempotentInstruction,
 } from "@solana/spl-token";
 import bs58 from "bs58";
-import "dotenv/config";
+import dotenv from "dotenv";
+
+// Look in this example's own directory first, then one level up. Each example is
+// a separate package, so `dotenv` would otherwise only ever see a `.env` sitting
+// beside the file you ran — meaning the same key had to be pasted three times to
+// try all three. The parent file lets you fill it in once; a local `.env` still
+// wins, because the first file to define a key keeps it.
+dotenv.config({ path: [".env", "../.env"] });
 
 const SOLANA_RPC_URL = process.env.SOLANA_RPC_URL ?? "https://api.mainnet-beta.solana.com";
 const OBLIQ_RPC_URL = process.env.OBLIQ_RPC_URL ?? "https://solana-paymaster-mainnet.kanalabs.io/rpc";
