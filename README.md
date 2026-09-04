@@ -63,22 +63,42 @@ There are also two separate pots of money, which is the other common confusion:
 - **Your tenant's fee payer** holds the SOL that pays gas. Only this one is topped up via the
   dashboard.
 
-## Run one
+## Run them
+
+Fill in `.env` once at this level, then each example is its own package — so you `cd` into it
+and install it separately.
+
+**Swap** — USDC to SOL through Jupiter. The only one with a read-only dry run:
 
 ```bash
 cd swap
-cp .env.example .env    # then fill in the two values above
 npm install
-npm run quote           # read-only: prints a live quote, sends nothing
-npm start               # the real thing
+npm run quote     # read-only: prints a live quote, sends nothing
+npm start         # the real thing — spends AMOUNT_USDC
 ```
 
-> `.env.example` lives inside each example directory, not at the repository root.
-> It starts with a dot, so most editors hide it by default — if you cannot see it in
-> the file tree, `ls -a` will show it, or enable hidden files.
+**Send SOL** — a native transfer where the sender pays no fee:
 
-Then open the printed signature in an explorer and check your wallet's SOL balance. It will
-not have moved.
+```bash
+cd transfer-sol
+npm install
+npm start         # sends AMOUNT_SOL (0.001 by default)
+```
+
+**Send USDC** — an SPL transfer that opens the recipient's account if they have never held it:
+
+```bash
+cd transfer-usdc
+npm install
+npm start
+```
+
+> `transfer-usdc` needs the mint spelled out on mainnet — it will stop and tell you if you
+> forget. Add to your `.env`:
+> `USDC_MINT=EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v`
+
+Each prints a signature. Open it in an explorer and check the sending wallet's SOL balance:
+it will not have moved.
 
 ## What OBLIQ actually pays
 
