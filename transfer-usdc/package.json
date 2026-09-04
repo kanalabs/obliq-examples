@@ -1,0 +1,24 @@
+{
+  "name": "obliq-gasless-transfer-usdc",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Gasless USDC (SPL token) transfer sponsored by the Obliq paymaster.",
+  "scripts": {
+    "register": "tsx index.ts register",
+    "setup": "tsx index.ts setup",
+    "start": "tsx index.ts transfer",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@solana/spl-token": "^0.4.8",
+    "@solana/web3.js": "^1.95.3",
+    "bs58": "^6.0.0",
+    "dotenv": "^16.4.5"
+  },
+  "devDependencies": {
+    "tsx": "^4.19.1",
+    "typescript": "^5.6.2",
+    "@types/node": "^20.14.0"
+  }
+}

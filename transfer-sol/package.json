@@ -1,0 +1,23 @@
+{
+  "name": "obliq-gasless-transfer-sol",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Gasless SOL transfer sponsored by the Obliq paymaster (fee payer).",
+  "scripts": {
+    "register": "tsx index.ts register",
+    "fund": "tsx index.ts fund",
+    "start": "tsx index.ts transfer",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@solana/web3.js": "^1.95.3",
+    "bs58": "^6.0.0",
+    "dotenv": "^16.4.5"
+  },
+  "devDependencies": {
+    "tsx": "^4.19.1",
+    "typescript": "^5.6.2",
+    "@types/node": "^20.14.0"
+  }
+}
