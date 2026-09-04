@@ -67,10 +67,15 @@ There are also two separate pots of money, which is the other common confusion:
 
 ```bash
 cd swap
+cp .env.example .env    # then fill in the two values above
 npm install
-npm run quote     # read-only: prints a live quote, sends nothing
-npm start         # the real thing
+npm run quote           # read-only: prints a live quote, sends nothing
+npm start               # the real thing
 ```
+
+> `.env.example` lives inside each example directory, not at the repository root.
+> It starts with a dot, so most editors hide it by default — if you cannot see it in
+> the file tree, `ls -a` will show it, or enable hidden files.
 
 Then open the printed signature in an explorer and check your wallet's SOL balance. It will
 not have moved.
