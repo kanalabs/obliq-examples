@@ -192,6 +192,18 @@ async function cmdFund() {
 }
 
 async function cmdTransfer() {
+  // Checked before any network call: a misconfiguration should cost a round trip
+  // to nowhere, not fail halfway through. A generated recipient is a convenience
+  // on a throwaway cluster and a way to destroy real money on mainnet — nobody
+  // holds its key, so whatever is sent there is gone for good.
+  if (!process.env.RECIPIENT?.trim() && !isLocalOrDevnet()) {
+    throw new Error(
+      "RECIPIENT is required on mainnet. Leaving it blank sends to a freshly " +
+        "generated address that nobody controls, and those funds cannot be recovered. " +
+        "Set RECIPIENT to a wallet address you own.",
+    );
+  }
+
   // 1. Who is the Obliq fee payer for our tenant?
   const { fee_payer } = await obliqRpc<{ fee_payer: string }>("getConfig");
   const feePayer = new PublicKey(fee_payer);

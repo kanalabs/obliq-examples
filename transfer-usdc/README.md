@@ -54,7 +54,8 @@ Set `USDC_MINT=EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v` for mainnet USDC.
 cp .env.example .env
 npm install
 
-> **One file for all three.** Copy the repository root's `.env.example` to `../.env`, fill it in once, and every example here reads it. A `.env` in this directory
+> **One file for all three.** Copy `.env.example` from the directory *above* this one to
+> `../.env`, fill it in once, and every example here reads it. A `.env` in this directory
 > still wins if you want to override something for this example alone. Both start with a
 > dot, so most editors hide them — `ls -a` will show them.
 npm start          # the gasless USDC transfer — moves real funds
@@ -73,7 +74,7 @@ against production — use the access flow above for that.
 | Variable | Local default | Notes |
 |----------|---------------|-------|
 | `USDC_MINT` | _(blank → test mint)_ | devnet `4zMMC9srt5Ri5X14GAgXhaHii3GnPAEERYPJgZJDncDU`, mainnet `EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v` |
-| `AMOUNT_USDC` | `1.0` | Human units (6 decimals internally) |
+| `AMOUNT_USDC` | `1.0` | Human units (6 decimals internally). Shared with the `swap` example — the same value drives both |
 | `USER_WALLET_SECRET_KEY` | _(auto)_ | Persisted across `setup`/`transfer` so they share a wallet |
 | `OBLIQ_TENANT_ID` | _(auto)_ | Captured at register; used to push config |
 
