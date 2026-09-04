@@ -1,0 +1,50 @@
+name: ci
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  # Typecheck only. These talk to mainnet and hold a signing key, so nothing here
+  # can be executed in CI — but they are the first code a prospective integrator
+  # reads, and they must not rot.
+  examples:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        example: [swap, transfer-sol, transfer-usdc]
+    defaults:
+      run:
+        working-directory: ${{ matrix.example }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+          cache-dependency-path: ${{ matrix.example }}/package-lock.json
+      - name: install
+        run: npm ci
+      - name: typecheck
+        run: npm run typecheck
+
+  # This repository is public. A committed credential here would be the worst
+  # possible outcome, so the check runs in CI rather than in someone's head.
+  secrets:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: no .env is tracked
+        run: |
+          if git ls-files | grep -E '(^|/)\.env$'; then
+            echo "::error::a .env file is tracked — it must never be committed"
+            exit 1
+          fi
+      - name: .env.example ships blank credentials
+        run: |
+          if grep -rnE '^(OBLIQ_API_KEY|USER_WALLET_SECRET_KEY|JUPITER_API_KEY)=.+' --include=.env.example .; then
+            echo "::error::.env.example must ship blank credentials"
+            exit 1
+          fi
